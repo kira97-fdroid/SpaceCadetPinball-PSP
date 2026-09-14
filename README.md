@@ -79,7 +79,9 @@ The script installs required host packages using `apt`, `dnf`, or `pacman`. If P
 
 ### Windows — native, no WSL
 
-Open PowerShell in this folder and run:
+### Windows — native, no WSL
+
+Open PowerShell in the directory where you extracted the **SpaceCadetPinball-PSP source package**, then run:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
