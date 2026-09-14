@@ -1,0 +1,25 @@
+# Generated PSP/runtime assets
+output/
+PINBALL.DAT
+PINBALL.WAV
+PINBALL.OGG
+SFXBANK.BIN
+SOUND*.WAV
+*.sf2
+*.sf3
+
+# Build trees / downloaded upstream sources
+build/
+build-*/
+SpaceCadetPinball-PSP-*/
+pspdev/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
