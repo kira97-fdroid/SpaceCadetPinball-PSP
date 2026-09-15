@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
-VERSION="1.0.0"
+VERSION="1.0.1"
 
 clean_drag_path() {
   local p="$1"
@@ -115,6 +115,8 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 UPSTREAM_COMMIT_PIN="cb9b7b886244a27773f66b0b19fdc2998392565e"
+UPSTREAM_PRIMARY_URL="https://github.com/k4zmu2a/SpaceCadetPinball.git"
+UPSTREAM_MIRROR_URL="https://github.com/kira97-fdroid/SpaceCadetPinball-upstream-snapshot.git"
 if [[ -n "${SC_PINBALL_UPSTREAM_ARCHIVE:-}" ]]; then
   echo; echo "== Extracting the pinned upstream source archive =="
   [[ -f "$SC_PINBALL_UPSTREAM_ARCHIVE" ]] || { echo "ERROR: upstream archive not found: $SC_PINBALL_UPSTREAM_ARCHIVE"; exit 1; }
@@ -132,10 +134,39 @@ if [[ -n "${SC_PINBALL_UPSTREAM_ARCHIVE:-}" ]]; then
   echo "Upstream archive: $ACTUAL"
 else
   echo; echo "== Cloning a clean upstream checkout =="
-  git clone --quiet https://github.com/k4zmu2a/SpaceCadetPinball.git "$WORK"
-  git -C "$WORK" checkout --quiet --detach "$UPSTREAM_COMMIT_PIN"
-  ACTUAL="$(git -C "$WORK" rev-parse HEAD)"
-  [[ "$ACTUAL" == "$UPSTREAM_COMMIT_PIN" ]] || { echo "ERROR: upstream commit mismatch"; exit 1; }
+
+  clone_pinned_upstream() {
+    local url="$1"
+    rm -rf "$WORK"
+    if ! git clone --quiet "$url" "$WORK"; then
+      rm -rf "$WORK"
+      return 1
+    fi
+    if ! git -C "$WORK" checkout --quiet --detach "$UPSTREAM_COMMIT_PIN"; then
+      rm -rf "$WORK"
+      return 1
+    fi
+    ACTUAL="$(git -C "$WORK" rev-parse HEAD)"
+    if [[ "$ACTUAL" != "$UPSTREAM_COMMIT_PIN" ]]; then
+      rm -rf "$WORK"
+      return 1
+    fi
+    return 0
+  }
+
+  if clone_pinned_upstream "$UPSTREAM_PRIMARY_URL"; then
+    echo "Upstream source: original k4zmu2a repository"
+  elif clone_pinned_upstream "$UPSTREAM_MIRROR_URL"; then
+    echo "WARNING: original upstream was unavailable; using the archival mirror."
+    echo "Upstream source: $UPSTREAM_MIRROR_URL"
+  else
+    echo "ERROR: could not retrieve pinned upstream commit $UPSTREAM_COMMIT_PIN"
+    echo "Tried:"
+    echo "  $UPSTREAM_PRIMARY_URL"
+    echo "  $UPSTREAM_MIRROR_URL"
+    exit 1
+  fi
+
   echo "Upstream: $ACTUAL"
 fi
 

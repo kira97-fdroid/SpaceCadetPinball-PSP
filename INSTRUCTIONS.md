@@ -51,7 +51,7 @@ You do **not** need to install PSPSDK manually before starting. On macOS/Linux t
 
 The first build may take substantially longer because dependencies and PSPDEV may need to be downloaded or built. Later builds reuse the installed environment.
 
-Internet access is required during the first setup and for the clean upstream checkout.
+Internet access is required during the first setup and for the clean upstream checkout. The builder tries the original k4zmu2a repository first and automatically falls back to [`kira97-fdroid/SpaceCadetPinball-upstream-snapshot`](https://github.com/kira97-fdroid/SpaceCadetPinball-upstream-snapshot) if the original source is unavailable; both paths are pinned to commit `cb9b7b886244a27773f66b0b19fdc2998392565e`.
 
 ## Build on macOS
 
@@ -109,7 +109,7 @@ The Windows launcher is native and **does not use WSL**. It will automatically:
 
 `pspdev-win` is a third-party Windows PSPDEV toolchain project. It supplies the PSP compiler, PSPSDK, host tools and a prebuilt PSP library bundle for MSYS2 without requiring WSL, Docker or a Linux virtual machine.
 
-For reliability, the Windows launcher downloads the exact pinned SpaceCadetPinball source ZIP with native PowerShell and then lets MSYS2 extract it. It does not use `git clone` for the upstream checkout on Windows.
+For reliability, the Windows launcher downloads the exact pinned SpaceCadetPinball source ZIP with native PowerShell and then lets MSYS2 extract it. It first tries the original upstream repository and automatically retries from the archival mirror if necessary. It does not use `git clone` for the upstream checkout on Windows.
 
 If Windows does not provide `winget`, install MSYS2 manually from https://www.msys2.org/ and rerun `build_windows.ps1`; the PSPDEV toolchain installation remains automatic.
 

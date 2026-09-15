@@ -85,7 +85,7 @@ if(PSP)
     create_pbp_file(
         TARGET SpaceCadetPinball
         TITLE "Space Cadet Pinball"
-        VERSION "01.000"
+        VERSION "01.001"
         MEMSIZE 1
     )
 else()

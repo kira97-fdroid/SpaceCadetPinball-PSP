@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$Version = "1.0.0"
+$Version = "1.0.1"
 Write-Host "============================================================"
 Write-Host " Space Cadet Pinball PSP $Version - native Windows builder"
 Write-Host "============================================================"
@@ -140,12 +140,30 @@ finally {
 # Windows installations because of MSYS2/Git TLS, proxy or terminal issues.
 $UpstreamCommit = "cb9b7b886244a27773f66b0b19fdc2998392565e"
 $UpstreamZip = Join-Path $env:TEMP ("SpaceCadetPinball-" + $UpstreamCommit + ".zip")
-$UpstreamUrl = "https://github.com/k4zmu2a/SpaceCadetPinball/archive/$UpstreamCommit.zip"
+$UpstreamPrimaryUrl = "https://github.com/k4zmu2a/SpaceCadetPinball/archive/$UpstreamCommit.zip"
+$UpstreamMirrorUrl = "https://github.com/kira97-fdroid/SpaceCadetPinball-upstream-snapshot/archive/$UpstreamCommit.zip"
+$UpstreamUrls = @($UpstreamPrimaryUrl, $UpstreamMirrorUrl)
 try {
-    Write-Host "Downloading the pinned upstream source archive..."
-    Invoke-WebRequest -Headers @{ "User-Agent" = "SpaceCadetPinball-PSP-builder/$Version" } -Uri $UpstreamUrl -OutFile $UpstreamZip
-    if (-not (Test-Path $UpstreamZip) -or (Get-Item $UpstreamZip).Length -lt 1024) {
-        throw "The pinned upstream source archive download failed or produced an invalid file."
+    $downloaded = $false
+    foreach ($UpstreamUrl in $UpstreamUrls) {
+        try {
+            if (Test-Path $UpstreamZip) { Remove-Item -Force $UpstreamZip -ErrorAction SilentlyContinue }
+            Write-Host "Downloading pinned upstream source: $UpstreamUrl"
+            Invoke-WebRequest -Headers @{ "User-Agent" = "SpaceCadetPinball-PSP-builder/$Version" } -Uri $UpstreamUrl -OutFile $UpstreamZip
+            if ((Test-Path $UpstreamZip) -and (Get-Item $UpstreamZip).Length -ge 1024) {
+                $downloaded = $true
+                if ($UpstreamUrl -eq $UpstreamMirrorUrl) {
+                    Write-Warning "Original upstream was unavailable; using the archival mirror."
+                }
+                break
+            }
+        }
+        catch {
+            Write-Warning ("Upstream download failed from " + $UpstreamUrl + ": " + $_.Exception.Message)
+        }
+    }
+    if (-not $downloaded) {
+        throw "Could not download the pinned upstream source from either the original repository or the archival mirror."
     }
     $env:SC_PINBALL_UPSTREAM_ARCHIVE_MSYS = Convert-ToMsysPath $UpstreamZip
 

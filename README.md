@@ -1,4 +1,4 @@
-# Space Cadet Pinball PSP 1.0.0
+# Space Cadet Pinball PSP 1.0.1
 
 > Development note: this PSP port was created with substantial assistance from AI tools for code generation, refactoring, debugging and analysis, together with iterative testing on real PSP hardware.
 
@@ -6,17 +6,19 @@ Special thanks to the original **SpaceCadetPinball** reverse-engineering/decompi
 The upstream project is MIT-licensed; its license text is included as [`UPSTREAM_LICENSE.txt`](UPSTREAM_LICENSE.txt).
 The PSP-specific additions and modifications are also MIT-licensed under [`LICENSE`](LICENSE). See [`LICENSING.md`](LICENSING.md) for the attribution split.
 
+For build reproducibility, the builders are pinned to upstream commit `cb9b7b886244a27773f66b0b19fdc2998392565e`. They try the original k4zmu2a repository first and automatically fall back to the archival mirror [`kira97-fdroid/SpaceCadetPinball-upstream-snapshot`](https://github.com/kira97-fdroid/SpaceCadetPinball-upstream-snapshot) if the original source is unavailable.
+
 A native PSP port of **3D Pinball - Space Cadet**, based on the open-source SpaceCadetPinball project.
 
 For controls, build steps and PSP installation layout, see [`INSTRUCTIONS.md`](INSTRUCTIONS.md).
 
 This package is designed to be **copyright-clean**: it contains only the PSP port, patching/build tools and source-side helpers. It does **not** ship `PINBALL.DAT`, original sound effects, `SFXBANK.BIN`, `PINBALL.WAV`, or a SoundFont. The user supplies their own original game files and the builder creates the required runtime assets locally.
 
-## v1.0.0 public release
+## v1.0.1 public release
 
-This is the first stable public release of SpaceCadetPinball-PSP.
+This maintenance release adds a pinned archival upstream fallback for long-term build reproducibility and aligns all package/build/EBOOT version metadata to **v1.0.1**.
 
-See [`RELEASE_NOTES_v1.0.0.md`](RELEASE_NOTES_v1.0.0.md) for the full release notes.
+See [`RELEASE_NOTES_v1.0.1.md`](RELEASE_NOTES_v1.0.1.md) for the full release notes. The original [`v1.0.0` release notes](RELEASE_NOTES_v1.0.0.md) remain available for reference.
 
 ## Main features
 
@@ -101,7 +103,7 @@ If `winget` is unavailable, install MSYS2 manually from https://www.msys2.org/ a
 5. locates `PINBALL.MID`;
 6. verifies the known original MIDI loop structure;
 7. generates one authentic loop iteration as `PINBALL.WAV`;
-8. obtains the exact pinned upstream source in a temporary directory (Windows downloads the pinned ZIP with PowerShell; macOS/Linux use a clean Git checkout);
+8. obtains the exact pinned upstream source in a temporary directory, trying the original k4zmu2a repository first and automatically falling back to the archival mirror if necessary (Windows downloads the pinned ZIP with PowerShell; macOS/Linux use a clean Git checkout);
 9. applies the consolidated PSP port;
 10. builds the EBOOT;
 11. copies the finished runtime files to `output/`;
